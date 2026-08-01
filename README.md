@@ -1,6 +1,6 @@
 # Sistema de Reservas de Laboratorio
 
-Plataforma web para gestionar la reserva de horas de laboratorio, con roles diferenciados para alumnos, profesores y administradores.
+Plataforma web centralizada para la gestión de reservas de laboratorios en la Escuela de Educación Superior Cibertec. Permite a los alumnos reservar cupos individuales, a los profesores reservar el salón completo y a los administradores gestionar todos los recursos del sistema. Integrado con infraestructura de red basada en Windows Server y Active Directory para autenticación centralizada.
 
 ---
 
@@ -18,7 +18,7 @@ Plataforma web para gestionar la reserva de horas de laboratorio, con roles dife
 
   
 ## Estructura
-
+```
 ├── sistema-reservas-lab-backend/     (Spring Boot + Maven)
 │   ├── controller/
 │   ├── service/
@@ -37,10 +37,10 @@ Plataforma web para gestionar la reserva de horas de laboratorio, con roles dife
 │   ├── models/
 │   └── guards/
 │
-└── recursos-red/                     (Infraestructura de red)
+└── recursos-red/(Infraestructura de red)
     ├── Active Directory (usuarios, grupos, unidades organizativas)
     └── Recursos compartidos (alumnos, docentes, material)
-
+```
 
 ---
 
