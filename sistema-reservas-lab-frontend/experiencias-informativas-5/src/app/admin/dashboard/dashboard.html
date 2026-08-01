@@ -1,0 +1,138 @@
+﻿<div class="admin-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Experiencias</h2>
+          <p>Informativas 5</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/admin/dashboard" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a routerLink="/admin/laboratorios"><i class="bi bi-pc-display-horizontal"></i> Laboratorios</a>
+        <a routerLink="/admin/horarios"><i class="bi bi-clock-history"></i> Horarios</a>
+        <a routerLink="/admin/profesores"><i class="bi bi-person-video3"></i> Profesores</a>
+        <a routerLink="/admin/alumnos"><i class="bi bi-mortarboard"></i> Alumnos</a>
+        <a routerLink="/admin/reservas"><i class="bi bi-calendar-check"></i> Reservas</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <span class="page-label">Panel administrativo</span>
+        <h1>Dashboard General</h1>
+        <p>Resumen del sistema de reservas de laboratorios y ambientes académicos.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="error" *ngIf="mensajeError">
+      {{ mensajeError }}
+    </div>
+
+    <div class="loading" *ngIf="cargando">
+      Cargando información del dashboard...
+    </div>
+
+    <section class="summary-grid" *ngIf="!cargando">
+
+      <div class="summary-card lab">
+        <span class="icon-box"><i class="bi bi-pc-display-horizontal"></i></span>
+        <div>
+          <p>Laboratorios activos</p>
+          <h2>{{ resumen.totalLaboratoriosActivos }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card teacher">
+        <span class="icon-box"><i class="bi bi-person-video3"></i></span>
+        <div>
+          <p>Profesores activos</p>
+          <h2>{{ resumen.totalProfesoresActivos }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card student">
+        <span class="icon-box"><i class="bi bi-mortarboard"></i></span>
+        <div>
+          <p>Alumnos activos</p>
+          <h2>{{ resumen.totalAlumnosActivos }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card total">
+        <span class="icon-box"><i class="bi bi-journal-check"></i></span>
+        <div>
+          <p>Total reservas</p>
+          <h2>{{ resumen.totalReservas }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card active">
+        <span class="icon-box"><i class="bi bi-check-circle"></i></span>
+        <div>
+          <p>Reservas activas</p>
+          <h2>{{ resumen.reservasActivas }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card canceled">
+        <span class="icon-box"><i class="bi bi-x-circle"></i></span>
+        <div>
+          <p>Reservas canceladas</p>
+          <h2>{{ resumen.reservasCanceladas }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card finished">
+        <span class="icon-box"><i class="bi bi-flag"></i></span>
+        <div>
+          <p>Reservas finalizadas</p>
+          <h2>{{ resumen.reservasFinalizadas }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card today">
+        <span class="icon-box"><i class="bi bi-calendar-day"></i></span>
+        <div>
+          <p>Reservas del día</p>
+          <h2>{{ resumen.reservasDelDia }}</h2>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="dashboard-grid">
+
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2>Últimas reservas registradas</h2>
+            <p>Visualiza rápidamente los últimos movimientos del sistema.</p>
+          </div>
+
+          <a routerLink="/admin/reservas"><i class="bi bi-calendar-check"></i> Reservas</a>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+

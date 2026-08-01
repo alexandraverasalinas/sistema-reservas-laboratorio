@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Cibertec</title>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+  <div class="bg-shape"></div>
+
+  <div class="container">
+    <div class="logo">
+      <img src="/img/logoCibertec.png" alt="Cibertec"/>
+
+      <div class="logo-sub">Sistema de Reserva de Laboratorios</div>
+    </div>
+
+    <div class="card">
+      <h1>Iniciar sesión</h1>
+      <p class="subtitle">Ingresa con tu cuenta institucional</p>
+
+      <div class="field">
+        <label>Correo</label>
+        <input type="email" id="correo" placeholder="correo@instituto.com"/>
+      </div>
+
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') login()"/>
+      </div>
+
+      <p class="msg error" id="error-msg"></p>
+
+      <button class="btn" onclick="login()">Ingresar</button>
+    </div>
+
+    <p class="bottom-link">
+      <a href="/registro.html">Crear cuenta de alumno</a>
+    </p>
+  </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <script>
+    async function login() {
+      const correo   = document.getElementById('correo').value.trim();
+      const password = document.getElementById('password').value;
+      const errorEl  = document.getElementById('error-msg');
+      errorEl.classList.remove('show');
+
+	  
+      if (!correo || !password) {
+		
+		
+        errorEl.textContent = 'Completa todos los campos.';
+        errorEl.classList.add('show');
+        return;
+      }
+	  
+	  
+	  
+
+      try {
+		
+		
+        const res = await fetch('http://localhost:8080/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo, password })
+        });
+
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+        localStorage.setItem('usuario', JSON.stringify(data));
+
+        const rol = data.rol;
+        if      (rol === 'ADMINISTRADOR') location.href = '/dashboard-admin.html';
+        else if (rol === 'PROFESOR')      location.href = '/dashboard-profesor.html';
+        else if (rol === 'ALUMNO')        location.href = '/dashboard-alumno.html';
+        else {
+			
+			
+          errorEl.textContent = 'Rol no reconocido';
+          errorEl.classList.add('show');
+        }
+
+		
+		
+      } catch {
+        errorEl.textContent = 'Correo o contrase Intenta de nuevo.';
+        errorEl.classList.add('show');
+      }
+	  
+    }
+	
+	
+  </script>
+</body>
+</html>

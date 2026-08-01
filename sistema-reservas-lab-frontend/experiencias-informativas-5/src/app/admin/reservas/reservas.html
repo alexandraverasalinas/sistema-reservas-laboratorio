@@ -1,0 +1,261 @@
+﻿<div class="admin-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Experiencias</h2>
+          <p>Informativas 5</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a routerLink="/admin/laboratorios"><i class="bi bi-pc-display-horizontal"></i> Laboratorios</a>
+        <a routerLink="/admin/horarios"><i class="bi bi-clock-history"></i> Horarios</a>
+        <a routerLink="/admin/profesores"><i class="bi bi-person-video3"></i> Profesores</a>
+        <a routerLink="/admin/alumnos"><i class="bi bi-mortarboard"></i> Alumnos</a>
+        <a routerLink="/admin/reservas" class="active"><i class="bi bi-calendar-check"></i> Reservas</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <span class="page-label">Administración</span>
+        <h1>Gestión de Reservas</h1>
+        <p>Consulta, filtra y administra las reservas realizadas por alumnos y profesores.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="summary-grid">
+
+      <div class="summary-card total">
+        <span class="icon-box"><i class="bi bi-journal-check"></i></span>
+        <div>
+          <p>Total reservas</p>
+          <h2>{{ reservas.length }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card active">
+        <span class="icon-box"><i class="bi bi-check-circle"></i></span>
+        <div>
+          <p>Reservadas</p>
+          <h2>{{ contarPorEstado('RESERVADO') }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card canceled">
+        <span class="icon-box"><i class="bi bi-x-circle"></i></span>
+        <div>
+          <p>Canceladas</p>
+          <h2>{{ contarPorEstado('CANCELADO') }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card finished">
+        <span class="icon-box"><i class="bi bi-flag"></i></span>
+        <div>
+          <p>Finalizadas</p>
+          <h2>{{ contarPorEstado('FINALIZADO') }}</h2>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="filter-card">
+
+      <div class="filter-title">
+        <h2>Filtros de búsqueda</h2>
+        <p>Encuentra reservas por estado, fecha, usuario, aula o motivo.</p>
+      </div>
+
+      <div class="filters-grid">
+
+        <div class="input-group">
+          <label>Buscar</label>
+          <input
+            type="text"
+            name="filtroTexto"
+            [(ngModel)]="filtroTexto"
+            (input)="aplicarFiltros()"
+            placeholder="Usuario, correo, aula, motivo o ID"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Estado</label>
+          <select
+            name="filtroEstado"
+            [(ngModel)]="filtroEstado"
+            (change)="aplicarFiltros()"
+          >
+            <option value="TODOS">Todos</option>
+            <option value="RESERVADO">Reservadas</option>
+            <option value="CANCELADO">Canceladas</option>
+            <option value="FINALIZADO">Finalizadas</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Fecha</label>
+          <input
+            type="date"
+            name="filtroFecha"
+            [(ngModel)]="filtroFecha"
+            (change)="aplicarFiltros()"
+          />
+        </div>
+
+        <button class="btn-clear" type="button" (click)="limpiarFiltros()"><i class="bi bi-eraser"></i> Limpiar filtros</button>
+
+      </div>
+
+    </section>
+
+    <section class="table-card">
+
+      <div class="table-header">
+        <div>
+          <h2>Reservas encontradas</h2>
+          <p>
+            Mostrando {{ reservasFiltradas.length }} de {{ reservas.length }} reservas registradas.
+          </p>
+        </div>
+
+        <button class="btn-refresh" type="button" (click)="listarReservas()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
+      </div>
+
+      <div class="loading" *ngIf="cargando">
+        Cargando reservas...
+      </div>
+
+      <div class="table-container" *ngIf="!cargando">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Laboratorio</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Tipo</th>
+              <th>Cupos</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr *ngFor="let reserva of reservasFiltradas">
+
+              <td>
+                <strong>#{{ reserva.idReserva }}</strong>
+              </td>
+
+              <td>
+                <strong>{{ reserva.usuario.nombres }} {{ reserva.usuario.apellidos }}</strong>
+                <small>{{ reserva.usuario.correo }}</small>
+              </td>
+
+              <td>
+                <span class="role-badge">
+                  {{ reserva.usuario.rol }}
+                </span>
+              </td>
+
+              <td>
+                <strong>{{ reserva.laboratorio.nombre }}</strong>
+                <small>{{ reserva.laboratorio.ubicacion }}</small>
+              </td>
+
+              <td>{{ reserva.fecha }}</td>
+
+              <td>
+                {{ reserva.horaInicio }} - {{ reserva.horaFin }}
+              </td>
+
+              <td>
+                <span class="badge tipo-alumno" *ngIf="reserva.tipoReserva === 'ALUMNO'">
+                  Alumno
+                </span>
+                <span class="badge tipo-profesor" *ngIf="reserva.tipoReserva === 'PROFESOR'">
+                  Profesor
+                </span>
+                <span class="badge tipo-admin" *ngIf="reserva.tipoReserva === 'ADMINISTRADOR'">
+                  Admin
+                </span>
+              </td>
+
+              <td>
+                <span *ngIf="reserva.tipoReserva === 'ALUMNO'">
+                  {{ reserva.cuposOcupados }}/15
+                </span>
+                <span *ngIf="reserva.tipoReserva !== 'ALUMNO'">
+                  Completo
+                </span>
+              </td>
+
+              <td>{{ reserva.motivo }}</td>
+
+              <td>
+                <span class="badge reservado" *ngIf="reserva.estado === 'RESERVADO'">
+                  Reservado
+                </span>
+
+                <span class="badge cancelado" *ngIf="reserva.estado === 'CANCELADO'">
+                  Cancelado
+                </span>
+
+                <span class="badge finalizado" *ngIf="reserva.estado === 'FINALIZADO'">
+                  Finalizado
+                </span>
+              </td>
+
+              <td>
+                <button class="btn-cancel" *ngIf="reserva.estado === 'RESERVADO'" (click)="cancelarReserva(reserva.idReserva)"><i class="bi bi-x-lg"></i> Cancelar</button>
+
+                <span class="no-action" *ngIf="reserva.estado !== 'RESERVADO'">
+                  Sin acción
+                </span>
+              </td>
+
+            </tr>
+
+            <tr *ngIf="reservasFiltradas.length === 0">
+              <td colspan="11" class="empty">
+                No se encontraron reservas con los filtros aplicados.
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

@@ -1,0 +1,229 @@
+﻿<div class="admin-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Experiencias</h2>
+          <p>Informativas 5</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a routerLink="/admin/laboratorios"><i class="bi bi-pc-display-horizontal"></i> Laboratorios</a>
+        <a routerLink="/admin/horarios"><i class="bi bi-clock-history"></i> Horarios</a>
+        <a routerLink="/admin/profesores" class="active"><i class="bi bi-person-video3"></i> Profesores</a>
+        <a routerLink="/admin/alumnos"><i class="bi bi-mortarboard"></i> Alumnos</a>
+        <a routerLink="/admin/reservas"><i class="bi bi-calendar-check"></i> Reservas</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <h1>Gestión de Profesores</h1>
+        <p>Registra, actualiza y administra los docentes del sistema.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="form-card">
+      <h2>{{ modoEdicion ? 'Editar profesor' : 'Nuevo profesor' }}</h2>
+
+      <form (ngSubmit)="guardarProfesor()" class="form-grid">
+
+        <div class="input-group">
+          <label>Nombres</label>
+          <input
+            type="text"
+            name="nombres"
+            [(ngModel)]="profesorForm.nombres"
+            placeholder="Ingrese nombres"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Apellidos</label>
+          <input
+            type="text"
+            name="apellidos"
+            [(ngModel)]="profesorForm.apellidos"
+            placeholder="Ingrese apellidos"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Correo</label>
+          <input
+            type="email"
+            name="correo"
+            [(ngModel)]="profesorForm.correo"
+            placeholder="correo@instituto.com"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>contraseña</label>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="profesorForm.password"
+            [placeholder]="modoEdicion ? 'Dejar vacío para no cambiar' : 'Ingrese contraseña'"
+          />
+        </div>
+
+        <div class="buttons full">
+          <button type="submit" class="btn-primary">
+            {{ modoEdicion ? 'Actualizar profesor' : 'Registrar profesor' }}
+          </button>
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="limpiarFormulario()"
+            *ngIf="modoEdicion"
+          >
+            Cancelar edición
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <section class="table-card">
+<div class="table-header">
+
+  <div>
+    <h2>Profesores registrados</h2>
+    <p>
+      Mostrando {{ profesoresFiltrados.length }} de {{ profesores.length }} profesores.
+    </p>
+  </div>
+
+  <button class="btn-refresh" type="button" (click)="listarProfesores()">
+    <i class="bi bi-arrow-clockwise"></i>
+    Actualizar
+  </button>
+
+</div>
+
+<section class="filter-card">
+
+  <div class="filter-title">
+    <h2>Filtros de búsqueda</h2>
+    <p>Busca profesores por nombre, correo, rol o estado.</p>
+  </div>
+
+  <div class="filters-grid">
+
+    <div class="input-group">
+      <label>Buscar</label>
+      <input
+        type="text"
+        name="filtroTexto"
+        [(ngModel)]="filtroTexto"
+        (input)="aplicarFiltros()"
+        placeholder="Nombre, apellido, correo o ID"
+      />
+    </div>
+
+    <div class="input-group">
+      <label>Estado</label>
+
+      <select
+        name="filtroEstado"
+        [(ngModel)]="filtroEstado"
+        (change)="aplicarFiltros()"
+      >
+        <option value="TODOS">Todos</option>
+        <option value="ACTIVO">Activos</option>
+        <option value="INACTIVO">Inactivos</option>
+      </select>
+    </div>
+
+    <button
+      class="btn-clear"
+      type="button"
+      (click)="limpiarFiltros()"
+    >
+      <i class="bi bi-eraser"></i>
+      Limpiar filtros
+    </button>
+
+  </div>
+
+</section>
+
+      <div class="loading" *ngIf="cargando">
+        Cargando profesores...
+      </div>
+
+      <div class="table-container" *ngIf="!cargando">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let profesor of profesoresFiltrados">
+              <td>{{ profesor.idUsuario }}</td>
+              <td><strong>{{ profesor.nombres }}</strong></td>
+              <td>{{ profesor.apellidos }}</td>
+              <td>{{ profesor.correo }}</td>
+              <td>{{ profesor.rol }}</td>
+              <td>
+                <span class="badge activo" *ngIf="profesor.estado">Activo</span>
+                <span class="badge inactivo" *ngIf="!profesor.estado">Inactivo</span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn-edit" (click)="editarProfesor(profesor)">
+                    Editar
+                  </button>
+
+                  <button class="btn-delete" (click)="desactivarProfesor(profesor.idUsuario)">
+                    Desactivar
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="profesoresFiltrados.length === 0">
+              <td colspan="7" class="empty">
+                No hay profesores registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+

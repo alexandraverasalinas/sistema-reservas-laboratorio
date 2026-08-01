@@ -1,0 +1,148 @@
+﻿<div class="user-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Reservas</h2>
+          <p>Profesor</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/profesor/calendario" class="active"><i class="bi bi-calendar-week"></i> Calendario</a>
+        <a routerLink="/profesor/mis-reservas"><i class="bi bi-journal-check"></i> Mis reservas</a>
+        <a routerLink="/profesor/perfil"><i class="bi bi-person-circle"></i> Perfil</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <span class="page-label">Reserva docente</span>
+        <h1>Calendario de Laboratorios</h1>
+        <p>Selecciona un laboratorio, consulta los bloques disponibles y registra tu reserva.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <section class="guide-card">
+      <div class="guide-item">
+        <span>1</span>
+        <p>Elige un laboratorio</p>
+      </div>
+      <div class="guide-line"></div>
+      <div class="guide-item">
+        <span>2</span>
+        <p>Consulta disponibilidad</p>
+      </div>
+      <div class="guide-line"></div>
+      <div class="guide-item">
+        <span>3</span>
+        <p>Reserva un bloque libre</p>
+      </div>
+    </section>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="filter-card">
+      <div class="input-group">
+        <label>Laboratorio</label>
+        <select name="laboratorio" [(ngModel)]="idLaboratorioSeleccionado">
+          <option [ngValue]="null">Seleccione un laboratorio</option>
+          <option *ngFor="let lab of laboratorios" [ngValue]="lab.idLaboratorio">
+            {{ lab.nombre }} - {{ lab.ubicacion }}
+          </option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Fecha</label>
+        <input type="date" name="fecha" [(ngModel)]="fechaSeleccionada" />
+      </div>
+      <div class="input-group">
+        <label>Motivo de reserva</label>
+        <input type="text" name="motivo" [(ngModel)]="motivo" placeholder="Ej. Clase práctica" />
+      </div>
+      <button class="btn-primary" (click)="consultarDisponibilidad()">Consultar disponibilidad</button>
+    </section>
+
+    <section class="availability-card">
+      <div class="section-header">
+        <div>
+          <h2>Disponibilidad</h2>
+        
+        </div>
+        <div class="legend">
+          <span><span class="dot green"></span> Disponible</span>
+          <span><span class="dot red"></span> Ocupado</span>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="cargando">Cargando disponibilidad...</div>
+
+      <div class="blocks" *ngIf="!cargando && disponibilidad.length > 0">
+        <ng-container *ngFor="let bloque of disponibilidad">
+          <div
+            class="block-card"
+            [class.disponible]="!bloque.tipoReserva"
+            [class.ocupado]="bloque.tipoReserva"
+          >
+            <div class="block-left">
+              <div class="block-icon">
+                <i class="bi"
+                  [class.bi-check-circle-fill]="!bloque.tipoReserva"
+                  [class.bi-x-circle-fill]="bloque.tipoReserva"
+                  [class.icon-success]="!bloque.tipoReserva"
+                  [class.icon-danger]="bloque.tipoReserva">
+                </i>
+              </div>
+              <div class="block-details">
+                <h3>{{ bloque.horaInicio }} - {{ bloque.horaFin }}</h3>
+                <p>{{ bloque.nombreLaboratorio }}</p>
+                <span class="cupos-info" *ngIf="bloque.tipoReserva === 'ALUMNO'">
+                  Alumnos: {{ bloque.cuposOcupados }}/{{ bloque.cuposTotales }}
+                </span>
+              </div>
+            </div>
+
+            <div class="block-action">
+              <button
+                *ngIf="!bloque.tipoReserva"
+                class="btn-reservar"
+                (click)="reservar(bloque)"
+              >
+                <i class="bi bi-calendar-plus"></i> Reservar
+              </button>
+
+              <span *ngIf="bloque.tipoReserva" class="ocupado-text">
+                <i class="bi bi-x-circle-fill"></i> No disponible
+              </span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="empty" *ngIf="!cargando && disponibilidad.length === 0 && !mensajeError">
+        <div class="empty-icon"><i class="bi bi-calendar-week"></i></div>
+        <h3>Consulta una fecha</h3>
+        <p>Selecciona un laboratorio y una fecha para visualizar los bloques disponibles.</p>
+      </div>
+    </section>
+
+  </main>
+</div>

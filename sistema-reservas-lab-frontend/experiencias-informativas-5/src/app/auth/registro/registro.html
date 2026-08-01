@@ -1,0 +1,74 @@
+﻿<div class="registro-page">
+
+  <div class="registro-card">
+
+    <div class="header">
+      <div class="logo">EI5</div>
+      <h1>Registro de alumno</h1>
+      <p>Crea tu cuenta para reservar laboratorios</p>
+    </div>
+
+    <form (ngSubmit)="registrar()">
+
+      <div class="input-group">
+        <label>Nombres</label>
+        <input
+          type="text"
+          name="nombres"
+          [(ngModel)]="nombres"
+          placeholder="Ingrese sus nombres"
+        />
+      </div>
+
+      <div class="input-group">
+        <label>Apellidos</label>
+        <input
+          type="text"
+          name="apellidos"
+          [(ngModel)]="apellidos"
+          placeholder="Ingrese sus apellidos"
+        />
+      </div>
+
+      <div class="input-group">
+        <label>Correo electrónico</label>
+        <input
+          type="email"
+          name="correo"
+          [(ngModel)]="correo"
+          placeholder="ejemplo@instituto.com"
+        />
+      </div>
+
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Crea una contraseña"
+        />
+      </div>
+
+      <div class="error" *ngIf="mensajeError">
+        {{ mensajeError }}
+      </div>
+
+      <div class="success" *ngIf="mensajeExito">
+        {{ mensajeExito }}
+      </div>
+
+      <button type="submit" [disabled]="cargando">
+        {{ cargando ? 'Registrando...' : 'Crear cuenta' }}
+      </button>
+
+    </form>
+
+    <p class="volver">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login">Inicia sesión</a>
+    </p>
+
+  </div>
+
+</div>

@@ -1,0 +1,162 @@
+﻿<div class="admin-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Experiencias</h2>
+          <p>Informativas 5</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a routerLink="/admin/laboratorios" class="active"><i class="bi bi-pc-display-horizontal"></i> Laboratorios</a>
+        <a routerLink="/admin/horarios"><i class="bi bi-clock-history"></i> Horarios</a>
+        <a routerLink="/admin/profesores"><i class="bi bi-person-video3"></i> Profesores</a>
+        <a routerLink="/admin/alumnos"><i class="bi bi-mortarboard"></i> Alumnos</a>
+        <a routerLink="/admin/reservas"><i class="bi bi-calendar-check"></i> Reservas</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <h1>Gestión de Laboratorios</h1>
+        <p>Registra, actualiza y administra los laboratorios disponibles.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="form-card">
+      <h2>{{ modoEdicion ? 'Editar laboratorio' : 'Nuevo laboratorio' }}</h2>
+
+      <form (ngSubmit)="guardarLaboratorio()" class="form-grid">
+
+        <div class="input-group">
+          <label>Nombre del laboratorio</label>
+          <input
+            type="text"
+            name="nombre"
+            [(ngModel)]="laboratorioForm.nombre"
+            placeholder="Ej. Laboratorio de Redes"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Ubicación</label>
+          <input
+            type="text"
+            name="ubicacion"
+            [(ngModel)]="laboratorioForm.ubicacion"
+            placeholder="Ej. Pabellón A - Piso 2"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Capacidad</label>
+          <input
+            type="number"
+            name="capacidad"
+            [(ngModel)]="laboratorioForm.capacidad"
+            placeholder="Ej. 30"
+          />
+        </div>
+
+        <div class="input-group full">
+          <label>Descripción</label>
+          <textarea
+            name="descripcion"
+            [(ngModel)]="laboratorioForm.descripcion"
+            placeholder="Descripción del laboratorio"
+          ></textarea>
+        </div>
+
+        <div class="buttons full">
+          <button type="submit" class="btn-primary">
+            {{ modoEdicion ? 'Actualizar laboratorio' : 'Registrar laboratorio' }}
+          </button>
+
+          <button type="button" class="btn-secondary" (click)="limpiarFormulario()" *ngIf="modoEdicion">
+            Cancelar edición
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <section class="table-card">
+      <div class="table-header">
+        <div>
+          <h2>Laboratorios registrados</h2>
+          <p>Total: {{ laboratorios.length }}</p>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="cargando">
+        Cargando laboratorios...
+      </div>
+
+      <div class="table-container" *ngIf="!cargando">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Laboratorio</th>
+              <th>Ubicación</th>
+              <th>Capacidad</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let lab of laboratorios">
+              <td>{{ lab.idLaboratorio }}</td>
+              <td><strong>{{ lab.nombre }}</strong></td>
+              <td>{{ lab.ubicacion }}</td>
+              <td>{{ lab.capacidad }}</td>
+              <td>{{ lab.descripcion }}</td>
+              <td>
+                <span class="badge activo" *ngIf="lab.estado">Activo</span>
+                <span class="badge inactivo" *ngIf="!lab.estado">Inactivo</span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn-edit" (click)="editarLaboratorio(lab)">Editar</button>
+                  <button class="btn-delete" (click)="desactivarLaboratorio(lab.idLaboratorio)">Desactivar</button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="laboratorios.length === 0">
+              <td colspan="7" class="empty">
+                No hay laboratorios registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+

@@ -1,0 +1,152 @@
+﻿<div class="login-page">
+
+  <section class="hero-section">
+
+    <div class="hero-content">
+
+      <div class="brand-header">
+        <div class="brand-logo">EF5</div>
+
+        <div>
+          <h1>Experiencias Formativas 5</h1>
+          <p>Sistema de reserva de laboratorios</p>
+        </div>
+      </div>
+
+      <div class="access-switch">
+        <button
+          type="button"
+          [class.active]="tipoAcceso === 'ALUMNO'"
+          (click)="seleccionarTipo('ALUMNO')"
+        >
+          Alumno
+        </button>
+
+        <button
+          type="button"
+          [class.active]="tipoAcceso === 'PROFESOR'"
+          (click)="seleccionarTipo('PROFESOR')"
+        >
+          Profesor
+        </button>
+      </div>
+
+<h2>Encuentra laboratorios disponibles y reserva tu espacio en segundos, de forma rápida, segura y sin complicaciones </h2>
+      <p class="hero-text">
+       
+      </p>
+
+      <div class="feature-list">
+
+        <div class="feature-card">
+          <span>
+            <i class="bi bi-calendar-week"></i>
+          </span>
+          <div>
+            <strong>Calendario</strong>
+            <small>Disponibilidad en tiempo real</small>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <span>
+            <i class="bi bi-shield-lock"></i>
+          </span>
+          <div>
+            <strong>Acceso seguro</strong>
+            <small>Ingreso para alumnos y docentes</small>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <span>
+            <i class="bi bi-pc-display-horizontal"></i>
+          </span>
+          <div>
+            <strong>Laboratorios</strong>
+            <small>Control de ambientes académicos</small>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="login-section">
+
+    <div class="login-card">
+
+      <div class="login-logo-area">
+        <div class="mini-logo">EI5</div>
+        <h2>Bienvenido</h2>
+        <p>{{ obtenerTextoAcceso() }}</p>
+      </div>
+
+      <div class="role-box">
+        <span>Ingreso seleccionado:</span>
+        <strong>{{ obtenerTituloAcceso() }}</strong>
+      </div>
+
+      <div class="error" *ngIf="mensajeError">
+        {{ mensajeError }}
+      </div>
+
+      <form (ngSubmit)="iniciarSesion()">
+
+        <div class="input-group">
+          <label>Correo institucional</label>
+
+          <div class="input-icon">
+            <span>
+              <i class="bi bi-envelope"></i>
+            </span>
+
+            <input
+              type="email"
+              name="correo"
+              [(ngModel)]="correo"
+              placeholder="Ingrese su correo institucional"
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Contraseña</label>
+
+          <div class="input-icon">
+            <span>
+              <i class="bi bi-lock"></i>
+            </span>
+
+            <input
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="Ingrese su contraseña"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" [disabled]="cargando">
+          <i class="bi bi-box-arrow-in-right"></i>
+          {{ cargando ? 'Validando acceso...' : 'Iniciar sesión' }}
+        </button>
+
+      </form>
+
+      <div class="divider">
+        <span>Registro disponible solo para alumnos</span>
+      </div>
+
+      <div class="register-box">
+        <p>¿No tienes cuenta?</p>
+        <a routerLink="/registro">Regístrate aquí</a>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>

@@ -1,0 +1,215 @@
+﻿<div class="user-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Reservas</h2>
+          <p>Alumno</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/alumno/calendario"><i class="bi bi-calendar-week"></i> Calendario</a>
+        <a routerLink="/alumno/mis-reservas" class="active"><i class="bi bi-journal-check"></i> Mis reservas</a>
+        <a routerLink="/alumno/perfil"><i class="bi bi-person-circle"></i> Perfil</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <span class="page-label">Historial académico</span>
+        <h1>Mis Reservas</h1>
+        <p>Consulta, filtra y administra tus reservas de laboratorios.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="summary-grid">
+
+      <div class="summary-card total">
+        <span class="icon-box"><i class="bi bi-journal-check"></i></span>
+        <div>
+          <p>Total</p>
+          <h2>{{ reservas.length }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card active">
+        <span class="icon-box"><i class="bi bi-check-circle"></i></span>
+        <div>
+          <p>Reservadas</p>
+          <h2>{{ contarPorEstado('RESERVADO') }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card canceled">
+        <span class="icon-box"><i class="bi bi-x-circle"></i></span>
+        <div>
+          <p>Canceladas</p>
+          <h2>{{ contarPorEstado('CANCELADO') }}</h2>
+        </div>
+      </div>
+
+      <div class="summary-card finished">
+        <span class="icon-box"><i class="bi bi-flag"></i></span>
+        <div>
+          <p>Finalizadas</p>
+          <h2>{{ contarPorEstado('FINALIZADO') }}</h2>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="filter-card">
+
+      <div class="filter-title">
+        <h2>Filtros de búsqueda</h2>
+        <p>Busca tus reservas por aula, motivo, fecha o estado.</p>
+      </div>
+
+      <div class="filters-grid">
+
+        <div class="input-group">
+          <label>Buscar</label>
+          <input
+            type="text"
+            name="filtroTexto"
+            [(ngModel)]="filtroTexto"
+            (input)="aplicarFiltros()"
+            placeholder="Aula, motivo o ID"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Estado</label>
+          <select
+            name="filtroEstado"
+            [(ngModel)]="filtroEstado"
+            (change)="aplicarFiltros()"
+          >
+            <option value="TODOS">Todos</option>
+            <option value="RESERVADO">Reservadas</option>
+            <option value="CANCELADO">Canceladas</option>
+            <option value="FINALIZADO">Finalizadas</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Fecha</label>
+          <input
+            type="date"
+            name="filtroFecha"
+            [(ngModel)]="filtroFecha"
+            (change)="aplicarFiltros()"
+          />
+        </div>
+
+        <button class="btn-clear" type="button" (click)="limpiarFiltros()"><i class="bi bi-eraser"></i> Limpiar filtros</button>
+
+      </div>
+
+    </section>
+
+    <section class="table-card">
+
+      <div class="table-header">
+        <div>
+          <h2>Reservas encontradas</h2>
+          <p>Mostrando {{ reservasFiltradas.length }} de {{ reservas.length }} reservas.</p>
+        </div>
+
+        <button class="btn-refresh" type="button" (click)="listarMisReservas()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
+      </div>
+
+      <div class="loading" *ngIf="cargando">
+        Cargando tus reservas...
+      </div>
+
+      <div class="table-container" *ngIf="!cargando">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Laboratorio</th>
+              <th>Ubicación</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let reserva of reservasFiltradas">
+              <td><strong>#{{ reserva.idReserva }}</strong></td>
+
+              <td>
+                <strong>{{ reserva.laboratorio.nombre }}</strong>
+              </td>
+
+              <td>{{ reserva.laboratorio.ubicacion }}</td>
+
+              <td>{{ reserva.fecha }}</td>
+
+              <td>{{ reserva.horaInicio }} - {{ reserva.horaFin }}</td>
+
+              <td>{{ reserva.motivo }}</td>
+
+              <td>
+                <span class="badge reservado" *ngIf="reserva.estado === 'RESERVADO'">
+                  Reservado
+                </span>
+
+                <span class="badge cancelado" *ngIf="reserva.estado === 'CANCELADO'">
+                  Cancelado
+                </span>
+
+                <span class="badge finalizado" *ngIf="reserva.estado === 'FINALIZADO'">
+                  Finalizado
+                </span>
+              </td>
+
+              <td>
+                <button class="btn-cancel" *ngIf="reserva.estado === 'RESERVADO'" (click)="cancelarReserva(reserva.idReserva)"><i class="bi bi-x-lg"></i> Cancelar</button>
+
+                <span class="no-action" *ngIf="reserva.estado !== 'RESERVADO'">
+                  Sin acción
+                </span>
+              </td>
+            </tr>
+
+            <tr *ngIf="reservasFiltradas.length === 0">
+              <td colspan="8" class="empty">
+                No se encontraron reservas con los filtros aplicados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+

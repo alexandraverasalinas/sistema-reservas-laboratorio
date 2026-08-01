@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro - Cibertec</title>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+	
+  <div class="bg-shape"></div>
+
+  
+  
+  <div class="container" style="max-width:460px">
+    <div class="logo">
+      <img src="/img/logoCibertec.png" alt="Cibertec"/>
+   
+      <div class="logo-sub">Sistema de Reserva de Laboratorios</div>
+	  
+	  
+    </div>
+	
+
+	
+	
+    <div class="card">
+      <h1>Crear cuenta</h1>
+      <p class="subtitle">Completa tus datos para registrarte</p>
+	  
+      <span class="rol-badge">Rol: Alumno</span>
+	  
+
+      <div class="row">
+        <div class="field">
+          <label>Nombres</label>
+          <input type="text" id="nombres" />
+        </div>
+        <div class="field">
+          <label>Apellidos</label>
+          <input type="text" id="apellidos" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Correo institucional</label>
+        <input type="email" id="correo" placeholder="tu.correo@instituto.com"/>
+      </div>
+
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••"/>
+      </div>
+
+      <p class="msg error"   id="error-msg"></p>
+      <p class="msg success" id="success-msg"></p>
+
+      <button class="btn" onclick="registrar()">Crear cuenta</button>
+    </div>
+
+    <p class="bottom-link">
+      Ya tienes una cuenta? <a href="/login.html">Iniciar sesión</a>
+    </p>
+  </div>
+
+  <script>
+    async function registrar() {
+      const nombres   = document.getElementById('nombres').value.trim();
+      const apellidos = document.getElementById('apellidos').value.trim();
+      const correo    = document.getElementById('correo').value.trim();
+      const password  = document.getElementById('password').value;
+      const errorEl   = document.getElementById('error-msg');
+      const successEl = document.getElementById('success-msg');
+
+      errorEl.classList.remove('show');
+      successEl.classList.remove('show');
+
+	  
+      if (!nombres || !apellidos || !correo || !password) {
+        errorEl.textContent = 'Completa todos los campos.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+	  
+	  
+	  
+      try {
+        const res = await fetch('http://localhost:8080/api/auth/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombres, apellidos, correo, password })
+        });
+		
+
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err || 'Error al registrar');
+        }
+
+        successEl.textContent = 'Cuenta creada. Redirigiendo...';
+        successEl.classList.add('show');
+        setTimeout(() => location.href = '/login.html', 1800);
+
+		
+      } catch (e) {
+        errorEl.textContent = e.message || 'No se pudo crear la cuenta';
+        errorEl.classList.add('show');
+      }
+    }
+  </script>
+</body>
+</html>

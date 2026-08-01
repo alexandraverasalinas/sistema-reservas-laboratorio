@@ -1,0 +1,118 @@
+﻿<div class="user-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Reservas</h2>
+          <p>Alumno</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/alumno/calendario"><i class="bi bi-calendar-week"></i> Calendario</a>
+        <a routerLink="/alumno/mis-reservas"><i class="bi bi-journal-check"></i> Mis reservas</a>
+        <a routerLink="/alumno/perfil" class="active"><i class="bi bi-person-circle"></i> Perfil</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <h1>Mi Perfil</h1>
+        <p>Actualiza tu información personal y credenciales de acceso.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="profile-card">
+
+      <div class="profile-header">
+        <div class="avatar" *ngIf="usuario">
+          {{ usuario.nombres.charAt(0) }}
+        </div>
+
+        <div>
+          <h2>{{ usuario?.nombres }} {{ usuario?.apellidos }}</h2>
+          <p>{{ usuario?.correo }}</p>
+          <span>{{ usuario?.rol }}</span>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="cargando">
+        Cargando perfil...
+      </div>
+
+      <form (ngSubmit)="actualizarPerfil()" class="form-grid" *ngIf="!cargando">
+
+        <div class="input-group">
+          <label>Nombres</label>
+          <input
+            type="text"
+            name="nombres"
+            [(ngModel)]="perfilForm.nombres"
+            placeholder="Ingrese sus nombres"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Apellidos</label>
+          <input
+            type="text"
+            name="apellidos"
+            [(ngModel)]="perfilForm.apellidos"
+            placeholder="Ingrese sus apellidos"
+          />
+        </div>
+
+        <div class="input-group full">
+          <label>Correo electrónico</label>
+          <input
+            type="email"
+            name="correo"
+            [(ngModel)]="perfilForm.correo"
+            placeholder="correo@instituto.com"
+          />
+        </div>
+
+        <div class="input-group full">
+          <label>Nueva contraseña</label>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="perfilForm.password"
+            placeholder="Dejar vacío si no deseas cambiarla"
+          />
+        </div>
+
+        <div class="buttons full">
+          <button type="submit" class="btn-primary">
+            Guardar cambios
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+</div>
+

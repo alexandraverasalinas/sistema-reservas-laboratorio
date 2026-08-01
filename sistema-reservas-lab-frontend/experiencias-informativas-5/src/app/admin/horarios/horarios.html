@@ -1,0 +1,190 @@
+﻿<div class="admin-page">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="logo">EI5</div>
+        <div>
+          <h2>Experiencias</h2>
+          <p>Informativas 5</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a routerLink="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a routerLink="/admin/laboratorios"><i class="bi bi-pc-display-horizontal"></i> Laboratorios</a>
+        <a routerLink="/admin/horarios" class="active"><i class="bi bi-clock-history"></i> Horarios</a>
+        <a routerLink="/admin/profesores"><i class="bi bi-person-video3"></i> Profesores</a>
+        <a routerLink="/admin/alumnos"><i class="bi bi-mortarboard"></i> Alumnos</a>
+        <a routerLink="/admin/reservas"><i class="bi bi-calendar-check"></i> Reservas</a>
+      </nav>
+    </div>
+
+    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div>
+        <h1>Gestión de Horarios</h1>
+        <p>Configura la disponibilidad de cada laboratorio por día y hora.</p>
+      </div>
+
+      <div class="user-box" *ngIf="usuario">
+        <span>{{ usuario.nombres.charAt(0) }}</span>
+        <div>
+          <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+          <small>{{ usuario.rol }}</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="messages">
+      <div class="error" *ngIf="mensajeError">{{ mensajeError }}</div>
+      <div class="success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    </div>
+
+    <section class="form-card">
+      <h2>{{ modoEdicion ? 'Editar horario' : 'Nuevo horario' }}</h2>
+
+      <form (ngSubmit)="guardarHorario()" class="form-grid">
+
+        <div class="input-group">
+          <label>Laboratorio</label>
+          <select
+            name="laboratorio"
+            [(ngModel)]="idLaboratorioSeleccionado"
+            [disabled]="modoEdicion"
+          >
+            <option [ngValue]="null">Seleccione un laboratorio</option>
+            <option
+              *ngFor="let lab of laboratorios"
+              [ngValue]="lab.idLaboratorio"
+            >
+              {{ lab.nombre }} - {{ lab.ubicacion }}
+            </option>
+          </select>
+          <small *ngIf="modoEdicion">El laboratorio no se cambia al editar. Solo se actualiza día y hora.</small>
+        </div>
+
+        <div class="input-group">
+          <label>día de la semana</label>
+          <select
+            name="diaSemana"
+            [(ngModel)]="horarioForm.diaSemana"
+          >
+            <option *ngFor="let dia of diasSemana" [value]="dia">
+              {{ dia }}
+            </option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Hora inicio</label>
+          <input
+            type="time"
+            name="horaInicio"
+            [(ngModel)]="horarioForm.horaInicio"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Hora fin</label>
+          <input
+            type="time"
+            name="horaFin"
+            [(ngModel)]="horarioForm.horaFin"
+          />
+        </div>
+
+        <div class="buttons full">
+          <button type="submit" class="btn-primary">
+            {{ modoEdicion ? 'Actualizar horario' : 'Registrar horario' }}
+          </button>
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="limpiarFormulario()"
+            *ngIf="modoEdicion"
+          >
+            Cancelar edición
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <section class="table-card">
+      <div class="table-header">
+        <div>
+          <h2>Horarios registrados</h2>
+          <p>Mostrando {{ horariosPaginados.length }} de {{ horarios.length }} | Página {{ paginaActual }} de {{ totalPaginas }}</p>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="cargando">
+        Cargando horarios...
+      </div>
+
+      <div class="table-container" *ngIf="!cargando">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Laboratorio</th>
+              <th>Ubicación</th>
+              <th>día</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let horario of horariosPaginados">
+              <td>{{ horario.idHorario }}</td>
+              <td><strong>{{ horario.laboratorio?.nombre }}</strong></td>
+              <td>{{ horario.laboratorio?.ubicacion }}</td>
+              <td>{{ horario.diaSemana }}</td>
+              <td>{{ horario.horaInicio }}</td>
+              <td>{{ horario.horaFin }}</td>
+              <td>
+                <span class="badge activo" *ngIf="horario.estado">Activo</span>
+                <span class="badge inactivo" *ngIf="!horario.estado">Inactivo</span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn-edit" (click)="editarHorario(horario)">
+                    Editar
+                  </button>
+
+                  <button class="btn-delete" (click)="desactivarHorario(horario.idHorario)">
+                    Desactivar
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="horariosPaginados.length === 0">
+              <td colspan="8" class="empty">
+                No hay horarios registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="paginacion" *ngIf="totalPaginas > 1">
+          <button (click)="cambiarPagina(1)" [disabled]="paginaActual === 1">Primero</button>
+          <button (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">Anterior</button>
+          <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+          <button (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual === totalPaginas">Siguiente</button>
+          <button (click)="cambiarPagina(totalPaginas)" [disabled]="paginaActual === totalPaginas">Último</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
